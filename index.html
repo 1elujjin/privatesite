@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>CloudDrive — Sleek Personal Media Vault</title>
+  <meta name="description" content="A simple, minimalist, dark-mode personal media gallery and file viewer for images, audio, and videos.">
+  <meta name="keywords" content="cloud drive, media gallery, minimalist file manager, dark mode vault">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Social SEO -->
+  <meta property="og:title" content="CloudDrive — Sleek Personal Media Vault">
+  <meta property="og:description" content="A high-performance minimalist dark mode file viewer.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* Global Reset & Base Styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      cursor: crosshair; /* "+" Plus Cursor */
+    }
+
+    body {
+      background-color: #000000;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Sparkle Trail Canvas */
+    #sparkle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Layout Structure */
+    header {
+      padding: 2rem 3rem;
+      border-bottom: 1px solid #1f1f1f;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+
+    .logo span {
+      color: #666;
+      font-weight: 400;
+      font-size: 0.9rem;
+      margin-left: 0.5rem;
+    }
+
+    main {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem;
+      flex: 1;
+    }
+
+    /* Drop Zone */
+    .upload-zone {
+      border: 1px dashed #333;
+      border-radius: 12px;
+      padding: 2.5rem;
+      text-align: center;
+      background: #050505;
+      transition: all 0.2s ease;
+      margin-bottom: 3rem;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #ffffff;
+      background: #0a0a0a;
+    }
+
+    .upload-zone p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    .upload-zone label {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background: #ffffff;
+      color: #000000;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .upload-zone label:hover {
+      opacity: 0.9;
+    }
+
+    .upload-zone input {
+      display: none;
+    }
+
+    /* Section Headers */
+    .section-title {
+      font-size: 1.1rem;
+      color: #888;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Media Grid */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .media-card {
+      background: #0a0a0a;
+      border: 1px solid #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .media-card:hover {
+      transform: translateY(-4px);
+      border-color: #333333;
+    }
+
+    .media-preview {
+      height: 200px;
+      width: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .media-preview img, .media-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-preview audio {
+      width: 85%;
+    }
+
+    .media-info {
+      padding: 1rem;
+      border-top: 1px solid #141414;
+    }
+
+    .media-title {
+      font-size: 0.9rem;
+      color: #eee;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .media-type {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid #111;
+      color: #444;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="sparkle-canvas"></canvas>
+
+  <header>
+    <div class="logo">CloudDrive <span>/media</span></div>
+  </header>
+
+  <main>
+    <!-- Live Drag & Drop Loader -->
+    <div class="upload-zone" id="drop-zone">
+      <p>Drop media files here or add them to your <code>/media</code> folder</p>
+      <label for="file-input">Select Files</label>
+      <input type="file" id="file-input" multiple accept="image/*,video/*,audio/*">
+    </div>
+
+    <div class="section-title">Media Items</div>
+    <div class="media-grid" id="media-grid"></div>
+  </main>
+
+  <footer>
+    &copy; CloudDrive — Minimalist Storage Architecture
+  </footer>
+
+  <script>
+    /* =========================================================
+       1. MEDIA FOLDER PRELOAD LIST
+       Add relative filenames placed inside your local /media folder:
+       ========================================================= */
+    const mediaFiles = [
+      { name: "sample-photo.jpg", type: "image", path: "media/sample-photo.jpg" },
+      { name: "sample-video.mp4", type: "video", path: "media/sample-video.mp4" },
+      { name: "sample-audio.mp3", type: "audio", path: "media/sample-audio.mp3" }
+    ];
+
+    const mediaGrid = document.getElementById('media-grid');
+
+    function createMediaCard(title, type, src) {
+      const card = document.createElement('div');
+      card.className = 'media-card';
+
+      let previewElement = '';
+      if (type === 'image') {
+        previewElement = `<img src="${src}" alt="${title}" loading="lazy">`;
+      } else if (type === 'video') {
+        previewElement = `<video src="${src}" controls></video>`;
+      } else if (type === 'audio') {
+        previewElement = `<audio src="${src}" controls></audio>`;
+      }
+
+      card.innerHTML = `
+        <div class="media-preview">${previewElement}</div>
+        <div class="media-info">
+          <div class="media-title" title="${title}">${title}</div>
+          <div class="media-type">${type}</div>
+        </div>
+      `;
+      return card;
+    }
+
+    // Render folder items
+    mediaFiles.forEach(file => {
+      mediaGrid.appendChild(createMediaCard(file.name, file.type, file.path));
+    });
+
+    /* =========================================================
+       2. DRAG & DROP / FILE INPUT HANDLER
+       ========================================================= */
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => dropZone.classList.add('dragover'));
+    ['dragleave', 'drop'].forEach(eventName => dropZone.classList.remove('dragover'));
+
+    dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+    fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    function handleFiles(files) {
+      Array.from(files).forEach(file => {
+        const url = URL.createObjectURL(file);
+        let type = 'unknown';
+        if (file.type.startsWith('image/')) type = 'image';
+        else if (file.type.startsWith('video/')) type = 'video';
+        else if (file.type.startsWith('audio/')) type = 'audio';
+
+        if (type !== 'unknown') {
+          mediaGrid.prepend(createMediaCard(file.name, type, url));
+        }
+      });
+    }
+
+    /* =========================================================
+       3. SPARKLE TRAIL CURSOR EFFECT
+       ========================================================= */
+    const canvas = document.getElementById('sparkle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', e => {
+      for (let i = 0; i < 3; i++) {
+        particles.push({
+          x: e.clientX,
+          y: e.clientY,
+          size: Math.random() * 3 + 1,
+          speedX: (Math.random() - 0.5) * 1.5,
+          speedY: (Math.random() - 0.5) * 1.5,
+          life: 1,
+          decay: Math.random() * 0.03 + 0.015
+        });
+      }
+    });
+
+    function animateSparkles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = "#ffffff";
+        ctx.fill();
+      }
+
+      requestAnimationFrame(animateSparkles);
+    }
+    animateSparkles();
+  </script>
+</body>
+</html>
