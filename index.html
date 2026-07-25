@@ -5,15 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- SEO Meta Tags -->
-  <title>CloudDrive — Sleek Personal Media Vault</title>
+  <title>pupsies</title>
   <meta name="description" content="A simple, minimalist, dark-mode personal media gallery and file viewer for images, audio, and videos.">
   <meta name="keywords" content="cloud drive, media gallery, minimalist file manager, dark mode vault">
   <meta name="robots" content="index, follow">
-  
-  <!-- Open Graph / Social SEO -->
-  <meta property="og:title" content="CloudDrive — Sleek Personal Media Vault">
-  <meta property="og:description" content="A high-performance minimalist dark mode file viewer.">
-  <meta property="og:type" content="website">
 
   <style>
     /* Global Reset & Base Styling */
@@ -46,161 +41,210 @@
       z-index: 9999;
     }
 
-    /* Layout Structure */
-    header {
-      padding: 2rem 3rem;
-      border-bottom: 1px solid #1f1f1f;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: #ffffff;
-    }
-
-    .logo span {
-      color: #666;
-      font-weight: 400;
-      font-size: 0.9rem;
-      margin-left: 0.5rem;
-    }
-
     main {
-      max-width: 1400px;
+      max-width: 1600px;
       width: 100%;
       margin: 0 auto;
-      padding: 2.5rem;
+      padding: 1rem;
       flex: 1;
-    }
-
-    /* Drop Zone */
-    .upload-zone {
-      border: 1px dashed #333;
-      border-radius: 12px;
-      padding: 2.5rem;
-      text-align: center;
-      background: #050505;
-      transition: all 0.2s ease;
-      margin-bottom: 3rem;
-    }
-
-    .upload-zone:hover, .upload-zone.dragover {
-      border-color: #ffffff;
-      background: #0a0a0a;
-    }
-
-    .upload-zone p {
-      color: #888;
-      font-size: 0.95rem;
-    }
-
-    .upload-zone label {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      background: #ffffff;
-      color: #000000;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 6px;
-      transition: opacity 0.2s;
-    }
-
-    .upload-zone label:hover {
-      opacity: 0.9;
-    }
-
-    .upload-zone input {
-      display: none;
     }
 
     /* Section Headers */
     .section-title {
-      font-size: 1.1rem;
-      color: #888;
-      font-weight: 500;
-      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    /* Media Grid */
+    /* Flushed Masonry Grid */
     .media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      column-count: 5;
+      column-gap: 0.6rem;
+    }
+
+    @media (max-width: 1200px) {
+      .media-grid { column-count: 4; }
+    }
+    @media (max-width: 900px) {
+      .media-grid { column-count: 3; }
+    }
+    @media (max-width: 600px) {
+      .media-grid { column-count: 2; }
     }
 
     .media-card {
-      background: #0a0a0a;
-      border: 1px solid #1a1a1a;
-      border-radius: 10px;
+      background: #080808;
+      border: 1px solid #141414;
+      border-radius: 4px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 0.6rem;
+      transition: border-color 0.15s ease, opacity 0.15s ease;
+      break-inside: avoid;
+      position: relative;
     }
 
     .media-card:hover {
-      transform: translateY(-4px);
-      border-color: #333333;
+      border-color: #333;
+      opacity: 0.95;
     }
 
     .media-preview {
-      height: 200px;
       width: 100%;
       background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      position: relative;
     }
 
-    .media-preview img, .media-preview video {
+    .media-preview img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .media-preview video {
+      width: 100%;
+      height: auto;
+      display: block;
     }
 
     .media-preview audio {
-      width: 85%;
+      width: 95%;
+      margin: 0.8rem 0;
     }
 
+    /* Video Indicator Badge */
+    .video-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .video-badge::after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 4px 0 4px 7px;
+      border-color: transparent transparent transparent #ffffff;
+      margin-left: 2px;
+    }
+
+    /* Compact Media Info */
     .media-info {
-      padding: 1rem;
-      border-top: 1px solid #141414;
+      padding: 0.4rem 0.6rem;
+      border-top: 1px solid #111;
+      background: #050505;
     }
 
-    .media-title {
-      font-size: 0.9rem;
-      color: #eee;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .media-type {
+    .media-description {
       font-size: 0.75rem;
-      color: #555;
-      margin-top: 0.3rem;
-      text-transform: uppercase;
+      color: #888;
+      line-height: 1.3;
+    }
+
+    /* Modal / Pop-Up Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      max-width: 92vw;
+      max-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content img, .modal-content video {
+      max-width: 92vw;
+      max-height: 80vh;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    }
+
+    .modal-content audio {
+      width: 450px;
+      max-width: 85vw;
+    }
+
+    .modal-filename {
+      margin-top: 1rem;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .modal-caption {
+      margin-top: 0.4rem;
+      color: #888;
+      font-size: 0.8rem;
+      text-align: center;
+      max-width: 800px;
+      line-height: 1.4;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.8rem;
+      color: #666;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: #fff;
     }
 
     footer {
-      padding: 2rem;
+      padding: 1rem;
       text-align: center;
-      border-top: 1px solid #111;
-      color: #444;
-      font-size: 0.8rem;
+      border-top: 1px solid #0d0d0d;
+      color: #333;
+      font-size: 0.75rem;
     }
   </style>
 </head>
@@ -208,96 +252,161 @@
 
   <canvas id="sparkle-canvas"></canvas>
 
-  <header>
-    <div class="logo">CloudDrive <span>/media</span></div>
-  </header>
-
   <main>
-    <!-- Live Drag & Drop Loader -->
-    <div class="upload-zone" id="drop-zone">
-      <p>Drop media files here or add them to your <code>/media</code> folder</p>
-      <label for="file-input">Select Files</label>
-      <input type="file" id="file-input" multiple accept="image/*,video/*,audio/*">
-    </div>
-
     <div class="section-title">Media Items</div>
     <div class="media-grid" id="media-grid"></div>
   </main>
 
+  <!-- Pop-Up Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <span class="modal-close" id="modal-close">&times;</span>
+    <div class="modal-content" id="modal-content"></div>
+    <div class="modal-filename" id="modal-filename"></div>
+    <div class="modal-caption" id="modal-caption"></div>
+  </div>
+
   <footer>
-    &copy; CloudDrive — Minimalist Storage Architecture
+    &copy; pupsies — Minimalist Storage Architecture
   </footer>
 
   <script>
     /* =========================================================
-       1. MEDIA FOLDER PRELOAD LIST
-       Add relative filenames placed inside your local /media folder:
+       1. FILES + EDITABLE DESCRIPTIONS
        ========================================================= */
-    const mediaFiles = [
-      { name: "sample-photo.jpg", type: "image", path: "media/sample-photo.jpg" },
-      { name: "sample-video.mp4", type: "video", path: "media/sample-video.mp4" },
-      { name: "sample-audio.mp3", type: "audio", path: "media/sample-audio.mp3" }
+    const mediaList = [
+      { file: "4928C189-FAC4-487A-AF73-16AFCCB50EBF.webp", description: "" },
+      { file: "A358EA2E-E9CF-4F4E-8255-7B0EF5A7581E.webp", description: "" },
+      { file: "B62A94F3-F1A8-4506-8C91-73F84149F252.webp", description: "" },
+      { file: "D212B874-9514-4C1D-950C-79D881E7D5BC.webp", description: "" },
+      { file: "DAD46D16-D55C-49D7-BA34-7518150E98C0.webp", description: "you used to what?" },
+      { file: "IMG_3145.webp", description: "" },
+      { file: "IMG_3153.webp", description: "" },
+      { file: "IMG_3154.webp", description: "" },
+      { file: "IMG_4470.webp", description: "" },
+      { file: "IMG_4476.webp", description: "" },
+      { file: "proofexpl.mov", description: 'pupsies "addressing" the songs' },
+      { file: "thighgap.png", description: "pupsies sending a 12 year old thigh pics at the age of 17" },
+      { file: "Screenshot_2026-07-21_at_4.20.16_PM.webp", description: "" },
+      { file: "Screenshot_2026-07-22_at_3.23.20_PM.webp", description: "" },
+      { file: "WOOF.mp4", description: "still her not addressing the situations" },
+      { file: "e382b33b450e48e19460ba6eb07dc5bf (1).mov", description: "" },
+      { file: "image (1) (1).webp", description: "" },
+      { file: "image (1) (2).webp", description: "" },
+      { file: "image (1).webp", description: "" },
+      { file: "image (10).webp", description: "leaked photos of her fetlife, a social networking platform for individuals involving in BDSM and extreme kinks" },
+      { file: "image (2) (1).webp", description: "" },
+      { file: "image (2) (2).webp", description: "" },
+      { file: "image (2).webp", description: "proof that deleted_user_0bdf549e40e0 is pupsies" },
+      { file: "image (3) (1).webp", description: "" },
+      { file: "image (3).webp", description: "" },
+      { file: "image (4).webp", description: "" },
+      { file: "image (5).webp", description: "" },
+      { file: "image (6).webp", description: "" },
+      { file: "image (7) (1).webp", description: "" },
+      { file: "image (7).webp", description: "" },
+      { file: "image (8).webp", description: "" },
+      { file: "image (9).webp", description: "" },
+      { file: "image.webp", description: "proof that deleted_user_0bdf549e40e0 is pupsies" },
+      { file: "qimage.webp", description: "" },
+      { file: "snipsnip.wav", description: "" }
     ];
 
     const mediaGrid = document.getElementById('media-grid');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalContent = document.getElementById('modal-content');
+    const modalFilename = document.getElementById('modal-filename');
+    const modalCaption = document.getElementById('modal-caption');
+    const modalClose = document.getElementById('modal-close');
 
-    function createMediaCard(title, type, src) {
+    function getFileType(fileName) {
+      const ext = fileName.split('.').pop().toLowerCase();
+      if (['webp', 'png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext)) return 'image';
+      if (['mov', 'mp4', 'webm', 'mkv'].includes(ext)) return 'video';
+      if (['wav', 'mp3', 'ogg', 'm4a', 'flac'].includes(ext)) return 'audio';
+      return 'unknown';
+    }
+
+    function createMediaCard(item, src) {
       const card = document.createElement('div');
       card.className = 'media-card';
 
+      const fileName = item.file || item.name;
+      const type = getFileType(fileName);
+      const description = item.description || '';
+
       let previewElement = '';
       if (type === 'image') {
-        previewElement = `<img src="${src}" alt="${title}" loading="lazy">`;
+        previewElement = `<img src="${src}" alt="media" loading="lazy">`;
       } else if (type === 'video') {
-        previewElement = `<video src="${src}" controls></video>`;
+        previewElement = `
+          <video src="${src}" muted loop playsinline></video>
+          <div class="video-badge"></div>
+        `;
       } else if (type === 'audio') {
         previewElement = `<audio src="${src}" controls></audio>`;
       }
 
       card.innerHTML = `
         <div class="media-preview">${previewElement}</div>
-        <div class="media-info">
-          <div class="media-title" title="${title}">${title}</div>
-          <div class="media-type">${type}</div>
-        </div>
+        ${description ? `<div class="media-info"><div class="media-description">${description}</div></div>` : ''}
       `;
+
+      // Video hover autoplay effect
+      if (type === 'video') {
+        const videoEl = card.querySelector('video');
+        card.addEventListener('mouseenter', () => videoEl.play().catch(() => {}));
+        card.addEventListener('mouseleave', () => { videoEl.pause(); videoEl.currentTime = 0; });
+      }
+
+      // Open Modal on Click
+      card.addEventListener('click', (e) => {
+        if (e.target.tagName === 'AUDIO') return;
+        openModal(type, src, fileName, description);
+      });
+
       return card;
     }
 
-    // Render folder items
-    mediaFiles.forEach(file => {
-      mediaGrid.appendChild(createMediaCard(file.name, file.type, file.path));
+    // Populate grid
+    mediaList.forEach(item => {
+      const filePath = `media/${encodeURIComponent(item.file)}`;
+      mediaGrid.appendChild(createMediaCard(item, filePath));
     });
 
     /* =========================================================
-       2. DRAG & DROP / FILE INPUT HANDLER
+       2. MODAL POP-UP LOGIC
        ========================================================= */
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
+    function openModal(type, src, fileName, caption) {
+      modalContent.innerHTML = '';
+      modalFilename.textContent = fileName || '';
+      modalCaption.textContent = caption || '';
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+      if (type === 'image') {
+        modalContent.innerHTML = `<img src="${src}" alt="preview">`;
+      } else if (type === 'video') {
+        modalContent.innerHTML = `<video src="${src}" controls autoplay></video>`;
+      } else if (type === 'audio') {
+        modalContent.innerHTML = `<audio src="${src}" controls autoplay></audio>`;
+      }
+
+      modalOverlay.classList.add('active');
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      modalContent.innerHTML = ''; // Stops audio/video playback
+      modalFilename.textContent = '';
+      modalCaption.textContent = '';
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
     });
 
-    ['dragenter', 'dragover'].forEach(eventName => dropZone.classList.add('dragover'));
-    ['dragleave', 'drop'].forEach(eventName => dropZone.classList.remove('dragover'));
-
-    dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
-    fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-    function handleFiles(files) {
-      Array.from(files).forEach(file => {
-        const url = URL.createObjectURL(file);
-        let type = 'unknown';
-        if (file.type.startsWith('image/')) type = 'image';
-        else if (file.type.startsWith('video/')) type = 'video';
-        else if (file.type.startsWith('audio/')) type = 'audio';
-
-        if (type !== 'unknown') {
-          mediaGrid.prepend(createMediaCard(file.name, type, url));
-        }
-      });
-    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
 
     /* =========================================================
        3. SPARKLE TRAIL CURSOR EFFECT
